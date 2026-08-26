@@ -11,6 +11,9 @@ env:
   OPENVINO_VERSION: "2026.3"
   BUILD_TYPE: Release
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: windows-latest
