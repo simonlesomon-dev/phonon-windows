@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 env:
-  OPENVINO_VERSION: "2025.2"
+  OPENVINO_VERSION: "2026.3"
   BUILD_TYPE: Release
 
 jobs:
@@ -20,13 +20,12 @@ jobs:
       - name: Installer OpenVINO (archive runtime + dev)
         shell: pwsh
         run: |
-          $ver = "${{ env.OPENVINO_VERSION }}"
-          $url = "https://storage.openvinotoolkit.org/repositories/openvino/packages/$ver/windows/openvino_toolkit_windows_2025.2.0.19156.c05cd0d19f4_x86_64.zip"
+          $url = "https://storage.openvinotoolkit.org/repositories/openvino/packages/${{ env.OPENVINO_VERSION }}/windows/openvino_toolkit_windows_2026.3.0.22451.bd8d6542e3c_x86_64.zip"
           Invoke-WebRequest -Uri $url -OutFile openvino.zip
           Expand-Archive openvino.zip -DestinationPath C:\openvino
           $dir = Get-ChildItem C:\openvino -Directory | Select-Object -First 1
           echo "OPENVINO_DIR=$($dir.FullName)\runtime\cmake" >> $env:GITHUB_ENV
-          echo "$($dir.FullName)\runtime\bin\intel64\Release" >> $env:GITHUB_PATH
+          Add-Content $env:GITHUB_PATH "$($dir.FullName)\runtime\bin\intel64\Release"
           Add-Content $env:GITHUB_PATH "$($dir.FullName)\runtime\3rdparty\tbb\bin"
 
       - name: Configurer CMake
