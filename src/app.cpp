@@ -111,14 +111,14 @@ LRESULT CALLBACK App::wndProc(HWND hwnd, UINT msg, WPARAM wp, LPARAM lp) {
         return 0;
 
     case WM_APP + 2: // model download failed
-        tray_.showBalloon(
+        self->tray_.showBalloon(
             L"Phonon — modèle indisponible",
             L"Le modèle n'a pas pu être téléchargé. "
             L"Vérifiez votre connexion puis relancez l'application.");
         return 0;
 
     case WM_APP + 3: // model present
-        updateTray();
+        self->updateTray();
         return 0;
 
     case WM_DESTROY:

@@ -1,6 +1,7 @@
 #pragma once
 #include <windows.h>
 #include <functional>
+#include <string>
 #include <thread>
 #include <atomic>
 #include <cstdint>
