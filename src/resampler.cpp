@@ -33,7 +33,7 @@ void Resampler::process(const float* interleaved, size_t frameCount,
             pos_ += 1.0 / ratio_;
         }
         pos_ -= 1.0;
-        std::copy(cur, cur + 1, prev_);
+        prev_[0] = cur;
         havePrev_ = true;
     }
 }

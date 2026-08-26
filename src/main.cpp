@@ -1,6 +1,8 @@
 #include "app.h"
 #include "settings.h"
 
+#include <objbase.h>
+
 namespace phonon {
 
 std::wstring utf8ToWide(const std::string& s) {

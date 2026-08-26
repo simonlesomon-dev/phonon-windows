@@ -5,6 +5,7 @@
 #include "model_downloader.h"
 #include "settings.h"
 
+#include <objbase.h>
 #include <shellapi.h>
 #include <string>
 #include <memory>

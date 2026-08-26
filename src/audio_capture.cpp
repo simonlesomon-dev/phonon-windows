@@ -1,6 +1,7 @@
 #include "audio_capture.h"
 #include "resampler.h"
 
+#include <objbase.h>
 #include <mmdeviceapi.h>
 #include <audioclient.h>
 #include <cstring>
