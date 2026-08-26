@@ -3,6 +3,7 @@
 
 #include <windows.h>
 #include <winhttp.h>
+#include <shellapi.h>
 #include <shlobj.h>
 #include <fstream>
 #include <thread>
@@ -40,22 +41,21 @@ bool ModelDownloader::isModelPresent() {
 bool ModelDownloader::httpGetToFile(const std::string& url,
                                     const std::wstring& destPath,
                                     std::string& error) {
-    // Parse https://host/path
     if (url.rfind("https://", 0) != 0) {
         error = "URL non supportée: " + url;
         return false;
     }
-    std::string rest = url.substr(8);
-    auto slash = rest.find('/');
-    std::string host = rest.substr(0, slash);
-    std::string path = slash == std::string::npos ? "/" : rest.substr(slash);
 
-    URL_COMPONENTSA uc{};
+    int wn = MultiByteToWideChar(CP_UTF8, 0, url.c_str(), -1, nullptr, 0);
+    std::wstring wurl(size_t(wn - 1), L'\0');
+    MultiByteToWideChar(CP_UTF8, 0, url.c_str(), -1, wurl.data(), wn);
+
+    URL_COMPONENTSW uc{};
     uc.dwStructSize = sizeof(uc);
-    char hostBuf[256] = {}, pathBuf[2048] = {};
-    uc.lpszHostName = hostBuf; uc.dwHostNameLength = sizeof(hostBuf);
-    uc.lpszUrlPath = pathBuf; uc.dwUrlPathLength = sizeof(pathBuf);
-    if (!WinHttpCrackUrlA(url.c_str(), 0, 0, &uc)) {
+    wchar_t hostBuf[256] = {}, pathBuf[2048] = {};
+    uc.lpszHostName = hostBuf; uc.dwHostNameLength = 256;
+    uc.lpszUrlPath = pathBuf; uc.dwUrlPathLength = 2048;
+    if (!WinHttpCrackUrlW(wurl.c_str(), 0, 0, &uc)) {
         error = "URL invalide"; return false;
     }
 
@@ -66,12 +66,10 @@ bool ModelDownloader::httpGetToFile(const std::string& url,
     if (!sess) { error = "WinHttpOpen"; return false; }
 
     bool ok = false;
-    HINTERNET conn = WinHttpConnect(sess,
-        std::wstring(hostBuf, hostBuf + uc.dwHostNameLength).c_str(),
-        INTERNET_DEFAULT_HTTPS_PORT, 0);
+    HINTERNET conn = WinHttpConnect(sess, hostBuf,
+                                    INTERNET_DEFAULT_HTTPS_PORT, 0);
     if (conn) {
-        HINTERNET req = WinHttpOpenRequest(conn, L"GET",
-            std::wstring(pathBuf, pathBuf + uc.dwUrlPathLength).c_str(),
+        HINTERNET req = WinHttpOpenRequest(conn, L"GET", pathBuf,
             nullptr, WINHTTP_NO_REFERER,
             WINHTTP_DEFAULT_ACCEPT_TYPES, WINHTTP_FLAG_SECURE);
         if (req && WinHttpSendRequest(req, WINHTTP_NO_ADDITIONAL_HEADERS, 0,
