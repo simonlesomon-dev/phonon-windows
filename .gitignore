@@ -1,0 +1,10 @@
+build/
+out/
+models/
+*.user
+.vs/
+.vscode/
+__pycache__/
+*.onnx
+*.xml
+*.bin

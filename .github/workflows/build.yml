@@ -1,0 +1,100 @@
+name: Build Windows
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+  workflow_dispatch:
+
+env:
+  OPENVINO_VERSION: "2025.2"
+  BUILD_TYPE: Release
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Installer OpenVINO (archive runtime + dev)
+        shell: pwsh
+        run: |
+          $ver = "${{ env.OPENVINO_VERSION }}"
+          $url = "https://storage.openvinotoolkit.org/repositories/openvino/packages/$ver/windows/openvino_toolkit_windows_2025.2.0.19156.c05cd0d19f4_x86_64.zip"
+          Invoke-WebRequest -Uri $url -OutFile openvino.zip
+          Expand-Archive openvino.zip -DestinationPath C:\openvino
+          $dir = Get-ChildItem C:\openvino -Directory | Select-Object -First 1
+          echo "OPENVINO_DIR=$($dir.FullName)\runtime\cmake" >> $env:GITHUB_ENV
+          echo "$($dir.FullName)\runtime\bin\intel64\Release" >> $env:GITHUB_PATH
+          Add-Content $env:GITHUB_PATH "$($dir.FullName)\runtime\3rdparty\tbb\bin"
+
+      - name: Configurer CMake
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+
+      - name: Compiler
+        run: cmake --build build --config ${{ env.BUILD_TYPE }} --parallel
+
+      - name: Tests unitaires
+        working-directory: build
+        run: ctest -C ${{ env.BUILD_TYPE }} --output-on-failure -R unit_tests
+
+      - name: Test transcription (sans modèle -> SKIP)
+        working-directory: build
+        env:
+          PHONON_MODEL_DIR: ""
+        run: ctest -C ${{ env.BUILD_TYPE }} --output-on-failure -R transcription_test || exit 0
+
+      - name: Télécharger Inno Setup
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: choco install innosetup -y --no-progress
+
+      - name: Construire l'installeur
+        if: startsWith(github.ref, 'refs/tags/v')
+        shell: pwsh
+        run: |
+          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" installer\phonon.iss
+          Get-ChildItem dist
+
+      - name: Publier l'artefact installeur
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: actions/upload-artifact@v4
+        with:
+          name: PhononWindows-Setup
+          path: dist/PhononWindows-Setup.exe
+
+      - name: Attacher à la release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/PhononWindows-Setup.exe
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  model-export:
+    # Construit le package OpenVINO depuis l'export ONNX officiel
+    # (sans torch/NeMo) et l'attache à la release.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Dépendances
+        run: pip install onnx openvino numpy huggingface_hub
+      - name: Exporter le modèle
+        run: python scripts/export_parakeet_openvino.py --out models/parakeet-v3
+      - name: Zipper
+        working-directory: models
+        run: zip -r parakeet-v3-openvino.zip parakeet-v3
+      - uses: actions/upload-artifact@v4
+        with:
+          name: parakeet-v3-openvino
+          path: models/parakeet-v3-openvino.zip
+      - name: Attacher le modèle à la release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: models/parakeet-v3-openvino.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

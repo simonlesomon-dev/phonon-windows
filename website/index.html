@@ -1,0 +1,58 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Phonon Windows — Dictée vocale locale, rapide et privée</title>
+<style>
+  :root { --accent:#a6e3a1; --bg:#11111b; --fg:#cdd6f4; --card:#181825; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body {
+    font-family:"Segoe UI",system-ui,sans-serif;
+    background:var(--bg); color:var(--fg);
+    min-height:100vh; display:flex; align-items:center; justify-content:center;
+  }
+  main { max-width:640px; padding:48px 24px; text-align:center; }
+  h1 { font-size:2.4rem; margin-bottom:.5rem; color:var(--accent); }
+  p.lead { font-size:1.15rem; opacity:.85; margin-bottom:2rem; }
+  .install {
+    display:inline-block; background:var(--accent); color:#1e1e2e;
+    font-size:1.2rem; font-weight:600; text-decoration:none;
+    padding:16px 40px; border-radius:12px;
+    transition:transform .15s, box-shadow .15s;
+  }
+  .install:hover { transform:translateY(-2px); box-shadow:0 8px 24px #0008; }
+  ul.features { list-style:none; margin-top:2.5rem; text-align:left; }
+  ul.features li { padding:10px 0; border-bottom:1px solid #ffffff14; }
+  kbd {
+    background:#313244; border-radius:6px; padding:2px 8px;
+    font-family:Consolas,monospace;
+  }
+  footer { margin-top:3rem; font-size:.85rem; opacity:.6; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Phonon Windows</h1>
+  <p class="lead">Dictée vocale 100&nbsp;% locale sur Windows&nbsp;11.
+     Transcription en français par IA, accélérée par votre NPU Intel.
+     Aucune donnée ne quitte votre machine.</p>
+
+  <a class="install"
+     href="https://github.com/simonlesomon-dev/phonon-windows/releases/latest/download/PhononWindows-Setup.exe">
+     ⬇ Installer pour Windows
+  </a>
+
+  <ul class="features">
+    <li>⌨️ <kbd>Ctrl</kbd>+<kbd>Espace</kbd> pour dicter, dans n'importe quelle application</li>
+    <li>⚡ Modèle <strong>Parakeet TDT v3</strong> exécuté via OpenVINO</li>
+    <li>🔋 Priorité au NPU Intel (Core Ultra), repli GPU puis CPU automatique</li>
+    <li>🛜 Fonctionne hors ligne après installation</li>
+    <li>🔒 Aucun envoi audio vers un serveur, aucun historique conservé</li>
+  </ul>
+
+  <footer>Windows 11 · Processeur recommandé : Intel Core Ultra (NPU) ·
+  Licence MIT</footer>
+</main>
+</body>
+</html>
