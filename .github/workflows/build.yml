@@ -37,6 +37,14 @@ jobs:
       - name: Compiler
         run: cmake --build build --config ${{ env.BUILD_TYPE }} --parallel
 
+      - name: Copier les DLL OpenVINO/TBB pour l'installeur
+        shell: pwsh
+        run: |
+          $dir = Get-ChildItem C:\openvino -Directory | Select-Object -First 1
+          Copy-Item "$($dir.FullName)\runtime\bin\intel64\Release\*.dll" build\Release\
+          Copy-Item "$($dir.FullName)\runtime\3rdparty\tbb\bin\*.dll" build\Release\
+          Get-ChildItem build\Release\*.dll | Select-Object Name
+
       - name: Tests unitaires
         working-directory: build
         run: ctest -C ${{ env.BUILD_TYPE }} --output-on-failure -R unit_tests

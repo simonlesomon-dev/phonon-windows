@@ -26,6 +26,7 @@ Name: "autostart"; Description: "Lancer Phonon au démarrage de Windows"; \
 
 [Files]
 Source: "..\build\Release\phonon.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\build\Release\*.dll"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs
 
 [Icons]
 Name: "{group}\Phonon"; Filename: "{app}\{#MyAppExeName}"
