@@ -1,4 +1,4 @@
-#include "mel_frontend.h"
+﻿#include "mel_frontend.h"
 
 #include <cmath>
 #include <algorithm>
@@ -6,6 +6,9 @@
 #include <fstream>
 
 namespace phonon {
+namespace {
+constexpr float kPi = 3.14159265358979f;
+}
 
 bool MelFrontend::load(const std::string& path) {
     std::ifstream f(path, std::ios::binary);
@@ -41,8 +44,8 @@ bool MelFrontend::load(const std::string& path) {
     twRe_.resize(kN / 2);
     twIm_.resize(kN / 2);
     for (int i = 0; i < kN / 2; ++i) {
-        twRe_[i] = std::cos(-2.0f * float(M_PI) * i / kN);
-        twIm_[i] = std::sin(-2.0f * float(M_PI) * i / kN);
+        twRe_[i] = std::cos(-2.0f * float(kPi) * i / kN);
+        twIm_[i] = std::sin(-2.0f * float(kPi) * i / kN);
     }
     return true;
 }

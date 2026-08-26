@@ -2,6 +2,7 @@
 
 #include <windows.h>
 #include <string>
+#include <thread>
 
 namespace phonon {
 

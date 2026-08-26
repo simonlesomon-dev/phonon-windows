@@ -55,7 +55,7 @@ bool ModelDownloader::httpGetToFile(const std::string& url,
     wchar_t hostBuf[256] = {}, pathBuf[2048] = {};
     uc.lpszHostName = hostBuf; uc.dwHostNameLength = 256;
     uc.lpszUrlPath = pathBuf; uc.dwUrlPathLength = 2048;
-    if (!WinHttpCrackUrlW(wurl.c_str(), 0, 0, &uc)) {
+    if (!WinHttpCrackUrl(wurl.c_str(), 0, 0, &uc)) {
         error = "URL invalide"; return false;
     }
 
