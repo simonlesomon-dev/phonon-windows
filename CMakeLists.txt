@@ -36,7 +36,7 @@ target_link_libraries(phonon PRIVATE
 )
 
 if(MSVC)
-  target_compile_options(phonon PRIVATE /W4 /permissive- /utf-8)
+  add_compile_options(/W4 /permissive- /utf-8)
 endif()
 
 # --- Tests ------------------------------------------------------------------
