@@ -144,6 +144,8 @@ void App::updateTray() {
                         deviceName_ + L")");
 }
 
+void App::toggleRecording() { onHotkey(); }
+
 void App::onHotkey() {
     if (state_ == EngineState::Processing) return;
 
