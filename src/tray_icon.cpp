@@ -1,6 +1,8 @@
 #include "tray_icon.h"
 #include "resource.h"
 
+#include <algorithm>
+
 namespace phonon {
 
 HICON TrayIcon::buildIcon() {
@@ -16,7 +18,7 @@ HICON TrayIcon::buildIcon() {
     FillRect(mem, &rc, bg);
     DeleteObject(bg);
 
-    HPEN pen = CreatePen(PS_SOLID, max(3, size / 10), RGB(166, 227, 161));
+    HPEN pen = CreatePen(PS_SOLID, (std::max)(3, size / 10), RGB(166, 227, 161));
     HPEN oldPen = (HPEN)SelectObject(mem, pen);
     HBRUSH brush = CreateSolidBrush(RGB(166, 227, 161));
     HBRUSH oldBrush = (HBRUSH)SelectObject(mem, brush);

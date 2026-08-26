@@ -1,6 +1,7 @@
 #include "model_downloader.h"
 #include "settings.h"
 
+#include <windows.h>
 #include <winhttp.h>
 #include <shlobj.h>
 #include <fstream>

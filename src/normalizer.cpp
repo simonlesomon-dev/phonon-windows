@@ -1,5 +1,6 @@
 #include "normalizer.h"
 
+#include <windows.h>
 #include <algorithm>
 #include <cwctype>
 #include <vector>
