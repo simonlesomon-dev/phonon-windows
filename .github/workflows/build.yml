@@ -45,6 +45,15 @@ jobs:
           Copy-Item "$($dir.FullName)\runtime\3rdparty\tbb\bin\*.dll" build\Release\
           Get-ChildItem build\Release\*.dll | Select-Object Name
 
+      - name: Publier le build portable Windows
+        uses: actions/upload-artifact@v4
+        with:
+          name: PhononWindows-portable-${{ github.sha }}
+          path: |
+            build/Release/phonon.exe
+            build/Release/*.dll
+          if-no-files-found: error
+
       - name: Tests unitaires
         working-directory: build
         run: ctest -C ${{ env.BUILD_TYPE }} --output-on-failure -R unit_tests
