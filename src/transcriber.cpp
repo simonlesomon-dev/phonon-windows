@@ -50,6 +50,20 @@ static std::string pathOf(const std::string& dir, const char* name) {
 
 bool Transcriber::init(const Config& cfg, std::string& error) {
     cfg_ = cfg;
+
+    // Give a useful error before OpenVINO receives a missing path. Its
+    // "file_exists(path)" exception otherwise hides which model asset is
+    // missing behind an internal front-end source location.
+    for (const char* name : {"encoder.xml", "encoder.bin",
+                             "decoder_joint.xml", "decoder_joint.bin",
+                             "frontend.bin", "tokens.txt"}) {
+        std::ifstream f(pathOf(cfg.modelDir, name), std::ios::binary);
+        if (!f) {
+            error = "Fichier modèle manquant: " + pathOf(cfg.modelDir, name);
+            return false;
+        }
+    }
+
     try {
         auto encModel =
             impl_->core.read_model(pathOf(cfg.modelDir, "encoder.xml"));
@@ -59,12 +73,11 @@ bool Transcriber::init(const Config& cfg, std::string& error) {
             {"length",       {{1}}}
         });
 
+        // Let the current OpenVINO NPU plugin select its compiler and its
+        // default efficiency-oriented mode. Forcing the legacy DRIVER
+        // compiler/max-tiles settings can block compilation on recent NPU
+        // drivers.
         ov::AnyMap encOpts;
-        if (cfg.device.rfind("NPU", 0) == 0) {
-            encOpts.emplace("NPU_COMPILER_TYPE", std::string("DRIVER"));
-            encOpts.emplace("NPU_COMPILATION_MODE_PARAMS",
-                            std::string("max-tiles=4"));
-        }
         impl_->encComp =
             impl_->core.compile_model(encModel, cfg.device, encOpts);
         impl_->encReq = impl_->encComp.create_infer_request();

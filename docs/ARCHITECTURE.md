@@ -39,8 +39,9 @@
 
 Au premier lancement, `Transcriber::pickDevice()` parcourt les devices
 OpenVINO disponibles et retourne le premier parmi `NPU`, `GPU`, `CPU`.
-L'encoder tourne sur ce device ; decoder/joint sont légers et restent
-sur CPU/GPU si nécessaire (le NPU est optimisé pour des graphes statiques).
+L’encoder utilise ce périphérique ; decoder/joint restent sur CPU. Les
+options de compilation NPU restent celles du plugin OpenVINO courant afin
+de conserver son mode efficacité par défaut.
 
 ## Décodage TDT
 

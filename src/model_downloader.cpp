@@ -33,7 +33,9 @@ static bool fileExists(const std::wstring& p) {
 bool ModelDownloader::isModelPresent() {
     std::wstring d = modelDir();
     return fileExists(d + L"\\encoder.xml") &&
+           fileExists(d + L"\\encoder.bin") &&
            fileExists(d + L"\\decoder_joint.xml") &&
+           fileExists(d + L"\\decoder_joint.bin") &&
            fileExists(d + L"\\frontend.bin") &&
            fileExists(d + L"\\tokens.txt");
 }
@@ -47,8 +49,14 @@ bool ModelDownloader::httpGetToFile(const std::string& url,
     }
 
     int wn = MultiByteToWideChar(CP_UTF8, 0, url.c_str(), -1, nullptr, 0);
-    std::wstring wurl(size_t(wn - 1), L'\0');
-    MultiByteToWideChar(CP_UTF8, 0, url.c_str(), -1, wurl.data(), wn);
+    if (wn <= 1) { error = "URL invalide"; return false; }
+    std::wstring wurl(size_t(wn), L'\0');
+    if (MultiByteToWideChar(CP_UTF8, 0, url.c_str(), -1,
+                            wurl.data(), wn) <= 1) {
+        error = "URL invalide";
+        return false;
+    }
+    wurl.resize(size_t(wn - 1));
 
     URL_COMPONENTSW uc{};
     uc.dwStructSize = sizeof(uc);
@@ -131,7 +139,10 @@ std::wstring ModelDownloader::ensureModel(const std::string& url,
     std::wstring zip = std::wstring(tmp) + L"phonon-parakeet-v3.zip";
 
     if (!httpGetToFile(url, zip, error)) return L"";
-    if (!extractZip(zip, modelDir(), error)) return L"";
+    // The release archive contains a top-level "parakeet-v3" directory.
+    // Extract into ...\\models (the parent), otherwise the files end up in
+    // ...\\models\\parakeet-v3\\parakeet-v3 and modelDir() cannot see them.
+    if (!extractZip(zip, modelRootDir(), error)) return L"";
 
     DeleteFileW(zip.c_str());
     return modelDir();

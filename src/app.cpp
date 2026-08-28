@@ -46,8 +46,13 @@ int App::run(HINSTANCE hInstance) {
     if (!hwnd_) return 1;
 
     createTray();
-    RegisterHotKey(hwnd_, HOTKEY_ID, MOD_CONTROL | MOD_NOREPEAT,
-                   VK_SPACE);
+    if (!RegisterHotKey(hwnd_, HOTKEY_ID, MOD_CONTROL | MOD_NOREPEAT,
+                        VK_SPACE)) {
+        tray_.showBalloon(
+            L"Phonon - raccourci indisponible",
+            L"Ctrl + Espace est deja utilise par une autre application. "
+            L"Desactivez le raccourci de Whispering/Qwen ASR puis relancez Phonon.");
+    }
 
     // Init model on a background thread.
     std::thread([this]() {
